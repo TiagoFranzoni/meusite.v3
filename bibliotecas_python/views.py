@@ -15,6 +15,10 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth import authenticate, login
 from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from .serializers import BibliotecasSerializer
+
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
 class Home(View):
@@ -34,13 +38,23 @@ class BibliotecasView(ArchiveIndexView):
     date_field = 'data_de_criacao'
     template_name = 'bibliotecas/bibliotecas_archive.html'
 
-
-class BibliotecasDetail(DetailView):
+class BibliotecasList(generics.ListCreateAPIView):
     """docstring"""
-    model = Bibliotecas
-    template_name = 'bibliotecas/bibliotecas_detail.html'
-    context_object_name = 'biblioteca'
-    # pk_url_kwarg = 'biblioteca_id'
+    permission_classes = [IsAuthenticated]
+    queryset = Bibliotecas.objects.all()
+    serializer_class = BibliotecasSerializer
+
+
+# class BibliotecasDetail(DetailView):
+#     """docstring"""
+#     model = Bibliotecas
+#     template_name = 'bibliotecas/bibliotecas_detail.html'
+#     context_object_name = 'biblioteca'
+
+class BibliotecasDetail(generics.RetrieveUpdateDestroyAPIView):
+    """docstring"""
+    queryset = Bibliotecas.objects.all()
+    serializer_class = BibliotecasSerializer
 
 
 class AdicionaBibliotecas(View):
